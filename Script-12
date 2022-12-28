@@ -1,0 +1,114 @@
+SELECT * FROM issues i 
+WHERE created_on > '2022-07-25 00:00:00'
+
+SELECT * FROM img i 
+WHERE created > '2022-07-25 05:00:00'
+
+SELECT * FROM journal_details jd 
+LEFT JOIN journals j 
+ON jd.journal_id = j.id 
+WHERE value = '3';
+--AND created_on < '2022-08-01 00:00:00'
+--AND user_id = '396';
+
+SELECT DISTINCT * FROM journal_details jd 
+LEFT JOIN journals j 
+ON jd.journal_id = j.id 
+LEFT JOIN users u 
+ON j.user_id = u.id
+WHERE value = '13'
+--AND old_value = '2'  
+--AND j.user_id = '420';
+--D created_on < '2022-07-26 00:00:00';
+
+
+SELECT DISTINCT journal_id , user_id, created_on FROM journal_details jd 
+INNER JOIN journals j 
+ON jd.journal_id = j.id 
+WHERE  j.user_id = '427'
+AND created_on BETWEEN '2022-08-31 00:00:00' AND '2022-09-30 23:59:59';
+
+SELECT user_id, created_on  FROM journals j 
+WHERE user_id = '400';
+
+-- 총 작업량
+SELECT u.firstname , is2."name" , count(*) FROM issues i 
+JOIN users u ON i.assigned_to_id = u.id
+JOIN issue_statuses is2 ON i.status_id = is2.id 
+GROUP BY u.firstname , is2."name"
+HAVING u.firstname = '이정한';
+
+
+SELECT count(*) FROM issues i
+JOIN users u ON i.assigned_to_id = u.id
+JOIN issue_statuses is2 ON i.status_id =is2.id 
+WHERE u.firstname = '강민지';
+
+
+-- 업데이트 시간별 
+SELECT i.status_id AS 상태창, u.firstname AS 이름, i.updated_on AS 작업날짜
+FROM issues i 
+JOIN users u ON i.assigned_to_id = u.id 
+JOIN issue_statuses is2 ON i.status_id  = is2.id
+WHERE u.firstname = '이성재'
+AND i.status_id = '4'
+AND i.updated_on BETWEEN '2022-08-31 00:00:00' AND '2022-09-30 23:59:59';
+
+
+SELECT * FROM img i
+WHERE i."path" LIKE '%/35/%'
+--WHERE i.created BETWEEN '2022-07-25 00:00:00' AND '2022-07-25 08:00:00'
+ORDER BY created DESC
+
+
+-- 라벨링 이미지 삭제 쿼리문 4가지
+SELECT * FROM img_lbl il
+WHERE il.img_id IN (513637,513636,513635,513634,513633,513632,513631,513630,513629,513628);
+
+SELECT * FROM img_ctgry_rel icr
+WHERE icr.img_id IN (513637,513636,513635,513634,513633,513632,513631,513630,513629,513628);
+
+DELETE  FROM img i
+WHERE i.id IN (523059,523058,523057,523056,523055,523054,523053,523052,523051);
+
+DELETE  FROM issues i
+WHERE i.img_id IN (523059,523058,523057,523056,523055,523054,523053,523052,523051);
+
+
+-- meta 라벨링 확인
+SELECT * FROM meta_dental md 
+WHERE md.meta_json LIKE '%pro%';
+
+-- img_id의 이미지 경로 i.id, i."path" , i2.subject , i2.img_id
+SELECT * FROM img i 
+JOIN issues i2 ON i.id = i2.img_id 
+WHERE i.id = 518836;
+
+
+SELECT i2.id  FROM issues i
+JOIN img i2 ON i.img_id = i2.id 
+WHERE i.id = 498629;
+
+SELECT * FROM meta_dental md 
+WHERE file_id = '502508';
+
+
+SELECT i.id AS "img_id" , i2.id , i."path"  FROM img i 
+JOIN issues i2 ON i.id = i2.img_id 
+WHERE i."path" LIKE '%2-2-2-2-2-10970370지희령_지희령_000_intraoral_upper.jpg%';
+
+SELECT * FROM issues i 
+WHERE img_id IN (500689, 512689);
+
+SELECT * FROM issues i 
+WHERE i.status_id = 13
+AND i.updated_on BETWEEN  '2022-08-24 00:00:00' AND '2022-09-26 00:00:00';
+
+
+--라벨링 메타데이터 확인
+SELECT * FROM meta_dental md 
+WHERE md.file_id = '499827'
+--AND md.lbl_type = 'keypointlabels'
+--AND md.lbl_type = 'polygonlabels';
+
+SELECT DISTINCT count(md.file_id) FROM meta_dental md 
