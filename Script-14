@@ -1,0 +1,68 @@
+SELECT DISTINCT *  FROM meta_dental md 
+WHERE file_id = '498614';
+
+SELECT DISTINCT *  FROM meta_dental md
+WHERE file_id = ('514752' OR '514534');
+
+--중복 처리, 3단계, 266건->278건
+SELECT DISTINCT file_id FROM meta_dental md
+WHERE meta_json LIKE '{"cavityLbl":"2"%';
+
+SELECT * FROM meta_dental md 
+WHERE meta_json LIKE '{"cavityLbl":"2"%';
+
+-- 중복 처리, 2단계, 301건
+SELECT DISTINCT file_id FROM meta_dental md 
+WHERE meta_json LIKE '{"cavityLbl":"1"%'
+
+SELECT * FROM meta_dental md 
+WHERE meta_json LIKE '{"cavityLbl":"1"%';
+
+-- 중복 처리, 1단계, 1406건
+SELECT DISTINCT file_id FROM meta_dental md 
+WHERE meta_json LIKE '{"cavityLbl":"0"%'
+
+SELECT * FROM meta_dental md 
+WHERE meta_json LIKE '{"cavityLbl":"0"%';
+
+-- 1805건
+SELECT DISTINCT file_id  FROM meta_dental md 
+WHERE meta_json LIKE '{"cavityLbl":%';
+
+SELECT  * FROM meta_dental md 
+WHERE meta_json = '{"cavityLbl":"0"}'
+AND meta_json != '{"cavityLbl":"1"}';
+
+-- 메타 중 중복되지 않으면서 keypoint만 
+SELECT DISTINCT md.file_id , * FROM meta_dental md
+WHERE lbl_type = 'keypointlabels';
+
+
+
+-- 결손치아 2094개
+SELECT DISTINCT file_id  FROM meta_dental md
+WHERE md.ctgry_code  IN ('1001', '1002', '1003', '1004');
+
+-- 키포인트 13874개
+SELECT DISTINCT file_id FROM meta_dental md 
+WHERE md.ctgry_code IN ('3001','3002', '3003');
+
+--이미지 경로
+SELECT * FROM img i 
+--WHERE i."path" LIKE '/home/hyoungmo/.anno_web_mr_workspace/41/images%';
+WHERE i.PATH LIKE '/data/datanuri/dental/41/images%';
+
+SELECT * FROM issues i 
+--WHERE i.status_id = 13
+WHERE  i.img_id = 5052;
+--AND img_id BETWEEN 512001 AND 520000;
+
+
+
+-- UPDATE issues
+-- set 컬럼1 = (서브쿼리)
+--where 조건 = 조건값
+
+-- update [테이블1]
+-- 컬럼1 = (Select 값1 From 테이블2 where 조건2 = 조건값2)
+-- where 조건1 = 조건값1
