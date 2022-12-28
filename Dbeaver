@@ -1,0 +1,177 @@
+
+--최신 확인
+SELECT * FROM issues i 
+WHERE assigned_to_id = 416
+AND status_id = 13
+
+
+-- 사람별 전체 건수
+select i.id , u.firstname from issues i
+left join users u on i.assigned_to_id = u.id
+where u.firstname = '이성재';
+
+
+-- 라벨러 각 상태별 건수 기간 조회(반려,1차요청)
+select a.firstname , a.name , count(*) from
+    (select u.firstname , i.id , is2."name" from issues i
+    left join journals j on i.id = j.journalized_id
+    left join journal_details jd on j.id = jd.journal_id
+    left join users u on i.assigned_to_id = u.id
+    left join issue_statuses is2  on jd.value = cast(is2.id as char)
+    where u.firstname = '국성우'
+    and j.created_on between '2022-07-25 00:00:00' and '2022-09-04 23:59:59'
+    group by u.firstname , i.id , is2."name") a
+group by a.firstname , a.name ;
+
+
+
+--통계(반려, 미작업, 1차요청)
+select is3."name" , count(*) from
+    (select j.user_id , i.id , max(j.created_on) from issues i
+    left join journals j on i.id = j.journalized_id
+    left join journal_details jd on j.id = jd.journal_id
+    left join users u on i.assigned_to_id = u.id
+    where u.firstname = '이정한'
+    and jd.value = '3'
+    and j.created_on between '2022-07-25 00:00:00' and '2022-09-04 23:59:59'
+    group by j.user_id , i.id) a
+left join journals j2 on a.id = j2.journalized_id and a."max" = j2.created_on
+left join journal_details jd2 on j2.id = jd2.journal_id
+left join issue_statuses is3 on jd2.value = cast(is3.id as char)
+group by is3."name" ;
+
+
+
+-- 라벨러 각 상태별 건수 기간 조회(완료, 미작업)
+select a.firstname , a.name , count(*) from
+    (select u.firstname , i.id , is2."name" from issues i
+    left join journals j on i.id = j.journalized_id
+    left join journal_details jd on j.id = jd.journal_id
+    left join users u on i.assigned_to_id = u.id
+    left join issue_statuses is2  on jd.value = cast(is2.id as varchar)
+    where u.firstname = '전성문'
+    and j.created_on between '2022-10-10 00:00:00' and '2022-10-16 23:59:59'
+    group by u.firstname , i.id , is2."name") a
+group by a.firstname , a.name ;
+
+
+-- 완료 건수 기간 조회
+select u.firstname , count(*) from issues i
+join users u on i.assigned_to_id = u.id
+and i.closed_on between '2022-07-25 00:00:00' and '2022-10-16 23:59:59'
+and i.status_id = '4'
+group by u.firstname ;
+
+
+-- 1차검수요청 건수
+select u.firstname , i.img_id , is2."name" from issues i
+left join journals j on i.id = j.journalized_id
+left join journal_details jd on j.id = jd.journal_id
+left join users u on i.assigned_to_id = u.id
+left join issue_statuses is2  on jd.value = cast(is2.id as varchar)
+where u.firstname = '김선아'
+and jd.value = '3'
+and j.created_on BETWEEN  '2022-10-10 00:00:01' and '2022-10-16 23:59:59'
+and i.img_id not in (
+    select i2.img_id from issues i2
+    left join journals j2 on i2.id = j2.journalized_id
+    left join journal_details jd2 on j2.id = jd2.journal_id
+    left join users u2 on i2.assigned_to_id = u2.id
+    left join issue_statuses is3 on jd2.value = cast(is3.id as varchar)
+    where u2.firstname = '김선아'
+    and jd2.value = '3'
+    and j2.created_on < '2022-10-10 00:00:00'
+)
+group by u.firstname , i.img_id , is2."name";
+
+
+
+-- 반려 건수
+select count(i.img_id) from journals j
+join journal_details jd on j.id = jd.journal_id
+join issues i on i.id = j.journalized_id
+join users u on i.assigned_to_id = u.id
+where jd.value = '6'
+and u.firstname = '이성재'
+and j.created_on between '2022-10-10 00:00:01' and '2022-10-16 23:59:59';
+
+
+-- 숫자만 바꿔서 검색
+select a.firstname , count(*) from (
+    select distinct u.id, u.firstname , i.img_id from issues i
+    left join journals j on i.id = j.journalized_id
+    left join journal_details jd on j.id = jd.journal_id
+    left join users u on i.assigned_to_id = u.id
+    left join issue_statuses is2  on jd.value = cast(is2.id as varchar)
+    where jd.value = '3'
+    and j.created_on between '2022-09-05 14:00:01' and '2022-09-05 23:59:59'
+    and (u.id , i.img_id) not in (
+        select u2.id , i2.img_id from issues i2
+        left join journals j2 on i2.id = j2.journalized_id
+        left join journal_details jd2 on j2.id = jd2.journal_id
+        left join users u2 on i2.assigned_to_id = u2.id
+        left join issue_statuses is3 on jd2.value = cast(is3.id as varchar)
+        where jd2.value = '3'
+        and j2.created_on < '2022-09-04 00:00:00'
+    )
+    group by u.id , i.img_id ) a
+group by a.id, a.firstname ;
+
+-- 검수자 완료건수 지급
+SELECT DISTINCT * FROM journal_details jd 
+JOIN journals j ON jd.journal_id = j.id 
+WHERE j.user_id = '437'
+AND old_value = '3'
+AND value = '4'
+AND created_on BETWEEN '2022-08-31 00:00:00' AND '2022-09-30 23:59:59';
+
+-- 충치 3단계
+SELECT DISTINCT md.file_id , md.meta_json  FROM meta_dental md 
+WHERE md.ctgry = '충치'
+AND md.meta_json LIKE '%cavityLbl":"2%'
+ORDER BY md.file_id;
+--AND md.file_id = '497376';
+
+
+-- 충치 1,2,3단계
+SELECT icr.img_id , i2.img_id, i2.subject AS 경로 FROM img_ctgry_rel icr 
+JOIN img i  ON icr.img_id = i.id
+JOIN issues i2 ON i2.img_id = i.id
+WHERE icr.img_ctgry_id = 220
+--AND i2.status_id != 13
+--AND i2.status_id != 3;
+
+
+-- 399, 435, 403, 412, 408, 404, 430, 428, 415
+SELECT * FROM issues i 
+WHERE (i.assigned_to_id = 399
+or i.assigned_to_id = 435
+or i.assigned_to_id = 403
+or i.assigned_to_id = 412
+OR i.assigned_to_id = 408
+OR i.assigned_to_id = 404
+OR i.assigned_to_id = 430
+OR i.assigned_to_id = 428
+OR i.assigned_to_id = 436
+OR i.assigned_to_id = 439
+OR i.assigned_to_id = 397
+OR i.assigned_to_id = 402)
+AND i.status_id = 4;
+	
+
+--특정 충치 찾기
+SELECT * FROM meta_dental md 
+WHERE file_id = '498674' AND lbl_type = 'rectanglelabels';
+
+SELECT * FROM issues i 
+WHERE i.img_id = 497371
+
+--jyj
+SELECT * FROM issues i 
+WHERE i.status_id = 13;
+
+SELECT count(*) FROM img;
+select count(*) from meta;
+select count(*) from issues;
+select count(*) from journals;
+select count(*) from journal_details;
