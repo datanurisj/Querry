@@ -1,0 +1,166 @@
+delete from img_ctgry_rel;
+
+
+delete from img_lbl;
+delete from img;
+delete from issues;
+delete from journal_details;
+delete from journals;
+
+--DELETE FROM meta;
+
+-- 반려건수
+SELECT jd.old_value , j.created_on , u.firstname 
+FROM journal_details jd 
+JOIN journals j ON jd.journal_id  = j.id
+JOIN users u ON u.id = j.user_id 
+WHERE old_value = '1'
+AND  j.created_on BETWEEN '2022-08-08 00:00:00' AND '2022-08-14 23:59:59'
+--AND u.firstname = '이성재';
+
+
+SELECT jd.old_value , j.created_on , u.firstname 
+FROM journal_details jd 
+JOIN journals j ON jd.journal_id  = j.id
+JOIN users u ON u.id = j.user_id 
+WHERE value = '3'
+AND  j.created_on BETWEEN '2022-08-01 00:00:00' AND '2022-08-07 23:59:59'
+AND u.firstname = '이성재';
+
+SELECT jd.old_value , j.created_on , u.firstname 
+FROM journal_details jd 
+JOIN journals j ON jd.journal_id  = j.id
+JOIN users u ON u.id = j.user_id 
+WHERE value = '3'
+AND  j.created_on BETWEEN '2022-07-24 00:00:00' AND '2022-07-31 23:59:59'
+AND u.firstname = '이성재';
+
+-- 검수자
+SELECT j.user_id 
+FROM journal_details jd 
+JOIN journals j ON jd.journal_id  = j.id
+JOIN users u ON u.id = j.user_id 
+WHERE old_value = '3'
+AND  value = '4'
+AND  j.created_on BETWEEN '2022-07-24 00:00:00' AND  '2022-08-30 23:59:59'
+AND  j.user_id = '417';
+--AND u.firstname = '이성재';
+
+
+SELECT file_id , ctgry ,meta_json FROM meta_dental md  
+WHERE meta_json = '{}'
+
+SELECT assigned_to_id AS chnm FROM issues i 
+WHERE assigned_to_id = 427
+--AND updated_on BETWEEN '2022-08-08 00:00:00' AND '2022-08-09 12:00:00';
+
+SELECT * FROM issues i 
+WHERE assigned_to_id = '428'
+AND status_id = '13'
+
+
+SELECT * FROM issues i 
+WHERE created_on > '2022-07-25 00:00:00'
+
+SELECT * FROM img i 
+WHERE created > '2022-07-25 05:00:00'
+
+SELECT * FROM journal_details jd 
+LEFT JOIN journals j 
+ON jd.journal_id = j.id 
+WHERE value = '3';
+--AND created_on < '2022-08-01 00:00:00'
+--AND user_id = '396';
+
+SELECT DISTINCT * FROM journal_details jd 
+LEFT JOIN journals j 
+ON jd.journal_id = j.id 
+LEFT JOIN users u 
+ON j.user_id = u.id
+WHERE value = '3'
+--AND old_value = '2'  
+--AND j.user_id = '420';
+--D created_on < '2022-07-26 00:00:00';
+
+
+SELECT DISTINCT journal_id , user_id, created_on FROM journal_details jd 
+INNER JOIN journals j 
+ON jd.journal_id = j.id 
+WHERE  j.user_id = '396'
+AND created_on < '2022-07-31 09:00:00';
+
+SELECT user_id, created_on  FROM journals j 
+WHERE user_id = '396';
+
+-- 총 작업량
+SELECT u.firstname , is2."name" , count(*) FROM issues i 
+JOIN users u ON i.assigned_to_id = u.id
+JOIN issue_statuses is2 ON i.status_id = is2.id 
+GROUP BY u.firstname , is2."name"
+HAVING u.firstname = '이성재';
+
+
+SELECT * FROM issues i 
+JOIN users u ON i.assigned_to_id = u.id
+JOIN issue_statuses is2 ON i.status_id = is2.id 
+WHERE i.updated_on BETWEEN '2022-07-24 00:00:00' AND '2022-08-14 23:59:59'
+--GROUP BY u.firstname , is2."name"
+--HAVING u.firstname = '심신미';
+
+-- 업데이트 시간별 
+SELECT i.status_id AS 상태창, u.firstname AS 이름, i.updated_on AS 작업날짜
+FROM issues i 
+JOIN users u ON i.assigned_to_id = u.id 
+JOIN issue_statuses is2 ON i.status_id  = is2.id
+WHERE u.firstname = '정상임'
+AND i.updated_on between '2022-08-08 00:00:00' and '2022-08-14 23:59:59'
+AND i.status_id = '3';
+
+
+SELECT * FROM img i
+WHERE i."path" LIKE '%/35/%'
+--WHERE i.created BETWEEN '2022-07-25 00:00:00' AND '2022-07-25 08:00:00'
+ORDER BY created desc
+
+
+select i.status_id as 상태창, u.firstname as 성함, i.updated_on as 작업시간 from issues i
+join users u on i.assigned_to_id = u.id 
+join issue_statuses is2 on is2.id = i.status_id 
+where status_id = 4
+and u.firstname = '이성재'
+and i.updated_on between '2022-07-25 00:00:00' and '2022-07-31 23:59:59';
+
+-- 반려, 생성 히스토리 확인
+select jd.old_value , jd.value , j.user_id , j.created_on  from journal_details jd 
+join journals j on jd.journal_id = j.id 
+where user_id = 404
+and old_value = '6'
+--and value = '3'
+and created_on between '2022-08-08 00:00:00' and '2022-08-14 23:59:59';
+
+-- 1차검수요청 히스토리 확인
+select * from journal_details jd 
+join journals j on jd.journal_id = j.id 
+where user_id = 413
+and value = '3' 
+and created_on between '2022-07-24 00:00:00' and '2022-07-31 23:59:59';
+
+
+
+-- yjjo
+SELECT * FROM img i
+WHERE i."path" NOT LIKE '/data%';
+
+--이미지 삭제 쿼리
+/*delect from img i 
+where i.id = 516246;
+
+delect from issues i 
+where i.img_id = 516246;
+
+----- 이미지 라벨링 후 삭제
+delect from img_lbl il 
+where il.img_id = 516246;
+
+SELECT * FROM img_ctgry_rel icr 
+WHERE icr.img_id = 516246;*/
