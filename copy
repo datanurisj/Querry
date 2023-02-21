@@ -1,0 +1,4 @@
+-- SELECT * INTO COPY_TABLE FROM BASIC_TABLE
+-- 테이블 복사
+
+SELECT * INTO [AdventureWorks2019].[HumanResources].[Department2] FROM [AdventureWorks2019].[HumanResources].[Department] 
