@@ -49,8 +49,8 @@ WHERE md.ctgry_code IN ('3001','3002', '3003');
 
 --이미지 경로
 SELECT * FROM img i 
---WHERE i."path" LIKE '/home/hyoungmo/.anno_web_mr_workspace/41/images%';
-WHERE i.PATH LIKE '/data/datanuri/dental/41/images%';
+--WHERE i."path" LIKE '/home/이성재/.anno_web_mr_workspace/41/images%';
+WHERE i.PATH LIKE '/data/회사명/dental/41/images%';
 
 SELECT * FROM issues i 
 --WHERE i.status_id = 13
