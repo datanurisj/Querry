@@ -1,0 +1,124 @@
+
+--idstry_employed_person 취업자수
+SELECT
+	prd_de AS "base_ymd",
+	pvsn_inst_nm AS "base_source",
+	substring(prd_de, 1, 4) AS "base_year",
+	CASE WHEN CAST(SUBSTRING(prd_de, 5, 6) AS INTEGER) < 7 THEN '상반기' ELSE '하반기' END AS "base_quarter",
+	itm_nm AS "division_name",
+	NULL AS "type_code",
+	SUM(CASE WHEN c2_nm = '계' THEN CAST(dt AS FLOAT8) ELSE 0 END) AS "base_sum",
+	SUM(CASE WHEN c2_nm = '남자' THEN CAST(dt AS FLOAT8) ELSE 0 END) AS "man",
+	SUM(CASE WHEN c2_nm = '여자' THEN CAST(dt AS FLOAT8) ELSE 0 END) AS "women",
+	NULL AS "sort_order",
+	'metis_admin' AS "reg" ,
+	CAST(NOW() AS TIMESTAMP WITHOUT TIME ZONE) AS "rgdtm" ,
+	'metis_admin' AS "updusr" ,
+	CAST(NOW() AS TIMESTAMP WITHOUT TIME ZONE) AS "upddtm"
+FROM kosis_gn_sgg_sexdstn_ecnomy_total_act_popltn
+where itm_nm = '취업자 (천명)' 
+--and prd_de BETWEEN @frdt@ AND @todt@
+group by prd_de, pvsn_inst_nm, itm_nm ; 
+
+
+select * from kosis_gn_sgg_sexdstn_ecnomy_total_act_popltn;
+
+--idstry_employment_rate 고용률
+select 
+	pre_de as "base_ymd",
+	pvsn_inst_nm as "base_source",
+	substring(prd_de, 1, 4) as "base_year",
+	case when cast(substring(prd_de, 5, 6) as integer) < 7 then '상반기' else '하반기' end as "base_quarter",
+	case when itm_nm = '고용률 (%)' then '고용률 (%)' end as "division_name",
+	null as "type_code",
+	case when itm_nm = '고용률 (%)' and c2_nm = '계' then cast(dt as int8) else 0 end as "base_sum",
+	case when itm_nm = '고용률 (%)' and c2_nm = '남자' then cast(dt as int8) else 0 end as "base_sum",
+
+
+--hshld_population_one_households_old_age
+select 
+	prd_de as "base_ymd",
+	pvsn_inst_nm as "base_source",
+	substring(prd_de, 1, 4) as "base_year",
+	case when itm_nm = '65세이상 1인가구＜br＞(A)' then '65세이상 1인가구＜br＞(A)' else null end as "division_name",
+	null as "type_code",
+	sum(case when itm_nm = '전체 일반가구＜br＞(B)' then cast(dt as FLOAT8) else 0 end) as "total_household",
+	sum(case when itm_nm = '65세이상 1인가구＜br＞(A)' then cast(dt as FLOAT8) else 0 end) as "old_age_one_household",
+	--sum(case when itm_nm = '65세이상 1인가구＜br＞(A)' then cast(dt as float8) else 0 end) as "base_ration",
+    --sum(cast(dt as numeric)) as "dt",
+	round(sum(case when itm_nm = '65세이상 1인가구＜br＞(A)' then cast(dt as FLOAT8) else 0 end) / sum(cast(dt as numeric))) as "base_ration",
+	null as "sort_order",
+	'metis_admin' AS "reg" ,
+	CAST(NOW() AS TIMESTAMP WITHOUT TIME ZONE) AS "rgdtm" ,
+	'metis_admin' AS "updusr" ,
+	CAST(NOW() AS TIMESTAMP WITHOUT TIME ZONE) AS "upddtm"
+from kosis_gw_lva_odsn_hshld_rate kglohr 
+--where itm_nm = '65세이상 1인가구＜br＞(A)'
+group by prd_de , pvsn_inst_nm, itm_nm, dt  
+order by prd_de;
+
+
+--hshld_population_one_households_old_age 65세이상 1인 가구
+select 
+	prd_de as "base_ymd",
+	pvsn_inst_nm as "base_source",
+	substring(prd_de, 1, 4) as "base_year",
+	case when itm_nm = '65세이상 1인가구＜br＞(A)' then '65세이상 1인가구＜br＞(A)' end as "division_name",
+	null as "type_code",
+	--sum(case when itm_nm = '전체 일반가구＜br＞(B)' then cast(dt as FLOAT8) else 0 end) as "total_household",
+	case when prd_de = '2022'then cast(dt as float8) 
+	when prd_de = '2021' then cast(dt as float8) 
+	when prd_de = '2020' then cast(dt as float8) 
+	when prd_de = '2019' then cast(dt as float8)
+	when prd_de = '2018' then cast(dt as float8) end as "total_household",
+	sum(case when itm_nm = '65세이상 1인가구＜br＞(A)' then cast(dt as FLOAT8) else 0 end) as "old_age_one_household",
+    --sum(case when itm_nm = '65세이상 1인가구＜br＞(A)' then cast(dt as float8) else 0 end) as "base_ration",
+    --sum(cast(dt as numeric)) as "dt",
+	round(sum(case when itm_nm = '65세이상 1인가구＜br＞(A)' then cast(dt as FLOAT8) else 0 end) / sum(cast(dt as numeric))) as "base_ration",
+	null as "sort_order",
+	'metis_admin' AS "reg" ,
+	CAST(NOW() AS TIMESTAMP WITHOUT TIME ZONE) AS "rgdtm" ,
+	'metis_admin' AS "updusr" ,
+	CAST(NOW() AS TIMESTAMP WITHOUT TIME ZONE) AS "upddtm"
+from kosis_gw_lva_odsn_hshld_rate kglohr 
+--where itm_nm = '65세이상 1인가구＜br＞(A)'
+group by prd_de, pvsn_inst_nm, itm_nm, dt ;
+
+
+select 
+	prd_de as "base_ymd",
+	pvsn_inst_nm as "base_source",
+	substring(prd_de, 1, 4) as "base_year",
+	null as "type_code",
+	sum(case when itm_nm = '전체 일반가구＜br＞(B)' then cast(dt as FLOAT8) else 0 end) as "total_household",
+	sum(case when itm_nm = '65세이상 1인가구＜br＞(A)' then cast(dt as float8) else 0 end) as "old_age_one_household",
+	sum(case when itm_nm = '65세이상 1인가구＜br＞(A)' then cast(dt as float8) else 0 end) / sum(case when itm_nm = '전체 일반가구＜br＞(B)' then cast(dt as float8) else 0 end) * 100 as "base_ration",
+	null as "sort_order",
+	'metis_admin' as "reg",
+	cast (now() as timestamp without time zone) as "rgdtm",
+	'metis_admin' as "updusr",
+	cast (now() as timestamp without time zone) as "upddtm"
+from kosis_gw_lva_odsn_hshld_rate kglohr
+group by prd_de, pvsn_inst_nm ;
+
+-- chajangnim editing
+SELECT 
+	prd_de AS "base_ymd" ,
+	pvsn_inst_nm AS "base_source" ,
+	SUBSTRING(prd_de , 1 , 4) AS "base_year" ,
+	--case when itm_nm = '65세이상 1인가구＜br＞(A)' then '65세이상 1인가구＜br＞(A)' end as "division_name",
+	SUM(CASE WHEN itm_nm = '65세이상 1인가구＜br＞(A)' THEN CAST(dt AS FLOAT8) ELSE 0 END) / SUM(CASE WHEN itm_nm = '전체 일반가구＜br＞(B)' THEN CAST(dt AS FLOAT8) ELSE 0 END) AS "base_ratio" , 
+	SUM(CASE WHEN itm_nm = '65세이상 1인가구＜br＞(A)' THEN CAST(dt AS FLOAT8) ELSE 0 END) AS "old_age_one_household" ,
+	SUM(CASE WHEN itm_nm = '전체 일반가구＜br＞(B)' THEN CAST(dt AS FLOAT8) ELSE 0 END) AS "total_household" ,
+	null as "sort_order",
+	'metis_admin' AS "reg",
+	CAST(NOW() AS TIMESTAMP WITHOUT TIME ZONE) AS "rgdtm",
+	'metis_admin' AS "updusr",
+	CAST(NOW() AS TIMESTAMP WITHOUT TIME ZONE) AS "upddtm"
+from kosis_gw_lva_odsn_hshld_rate kglohr
+--WHERE data_strd_ymd BETWEEN @frdt@ AND @todt@ 
+GROUP BY prd_de , pvsn_inst_nm ;
+
+
+
+select cast(count(*) as float) from kosis_gw_lva_odsn_hshld_rate kglohr 
